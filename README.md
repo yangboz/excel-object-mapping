@@ -10,7 +10,7 @@ $ mvn clean install -U
 <dependency>
     <groupId>com.blogspot.na5cent</groupId>
     <artifactId>excel-object-mapping</artifactId>
-    <version>1.0-SNAPSHORT</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 - Write code
