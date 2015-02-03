@@ -7,18 +7,22 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author redcrow
  */
-public class DateTypeConverter implements TypeConverter<Date> {
+public class DateTypeConverter implements TypeConverter<Date>
+{
 
-    private static final Logger LOG = LoggerFactory.getLogger(DateTypeConverter.class);
+    // private static final Logger LOG = LoggerFactory.getLogger(DateTypeConverter.class);
+    private static Logger LOG = LogManager.getLogger(DateTypeConverter.class);
 
     @Override
-    public Date convert(Object value, String... pattern) {
+    public Date convert(Object value, String... pattern)
+    {
         if (value == null) {
             return null;
         }

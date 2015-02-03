@@ -5,23 +5,25 @@ package com.blogspot.na5cent.exom;
 
 import java.io.File;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 
 /**
  * @author redcrow
  */
-public class LoadExcel2Model {
+public class LoadExcel2Model
+{
 
-    private static final Logger LOG = LoggerFactory.getLogger(LoadExcel2Model.class);
+    // private static final Logger LOG = LoggerFactory.getLogger(LoadExcel2Model.class);
+    private static Logger LOG = LogManager.getLogger(LoadExcel2Model.class);
 
     @Test
-    public void test() throws Throwable {
+    public void test() throws Throwable
+    {
         File excelFile = new File(getClass().getResource("/excel.xlsx").getPath());
-        List<Model> items = ExOM.mapFromExcel(excelFile)
-                .toObjectOf(Model.class)
-                .map();
+        List<Model> items = ExOM.mapFromExcel(excelFile).toObjectOf(Model.class).map();
 
         for (Model item : items) {
             LOG.debug("first name --> {}", item.getFistName());

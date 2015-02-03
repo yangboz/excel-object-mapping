@@ -3,8 +3,6 @@
  */
 package com.blogspot.na5cent.exom;
 
-import com.blogspot.na5cent.exom.util.EachFieldCallback;
-import com.blogspot.na5cent.exom.util.ReflectionUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -15,39 +13,50 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.blogspot.na5cent.exom.util.EachFieldCallback;
+import com.blogspot.na5cent.exom.util.ReflectionUtils;
 
 /**
  * @author redcrow
  */
-public class ExOM {
+public class ExOM
+{
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExOM.class);
+    // private static final Logger LOG = LoggerFactory.getLogger(ExOM.class);
+    private static Logger LOG = LogManager.getLogger(ExOM.class);
 
     private final File excelFile;
+
     private Class clazz;
 
-    private ExOM(File excelFile) {
+    private ExOM(File excelFile)
+    {
         this.excelFile = excelFile;
     }
 
-    public static ExOM mapFromExcel(File excelFile) {
+    public static ExOM mapFromExcel(File excelFile)
+    {
         return new ExOM(excelFile);
     }
 
-    public ExOM toObjectOf(Class clazz) {
+    public ExOM toObjectOf(Class clazz)
+    {
         this.clazz = clazz;
         return this;
     }
 
-    private String getValueByName(String name, Row row, Map<String, Integer> cells) {
+    private String getValueByName(String name, Row row, Map<String, Integer> cells)
+    {
         if (cells.get(name) == null) {
             return null;
         }
@@ -56,41 +65,45 @@ public class ExOM {
         return getCellValue(cell);
     }
 
-    private void mapName2Index(String name, Row row, Map<String, Integer> cells) {
+    private void mapName2Index(String name, Row row, Map<String, Integer> cells)
+    {
         int index = findIndexCellByName(name, row);
         if (index != -1) {
             cells.put(name, index);
         }
     }
 
-    private void readExcelHeader(final Row row, final Map<String, Integer> cells) throws Throwable {
-        ReflectionUtils.eachFields(clazz, new EachFieldCallback() {
+    private void readExcelHeader(final Row row, final Map<String, Integer> cells) throws Throwable
+    {
+        ReflectionUtils.eachFields(clazz, new EachFieldCallback()
+        {
 
             @Override
-            public void each(Field field, String name) throws Throwable {
+            public void each(Field field, String name) throws Throwable
+            {
                 mapName2Index(name, row, cells);
             }
         });
     }
 
-    private Object readExcelContent(final Row row, final Map<String, Integer> cells) throws Throwable {
+    private Object readExcelContent(final Row row, final Map<String, Integer> cells) throws Throwable
+    {
         final Object instance = clazz.newInstance();
-        ReflectionUtils.eachFields(clazz, new EachFieldCallback() {
+        ReflectionUtils.eachFields(clazz, new EachFieldCallback()
+        {
 
             @Override
-            public void each(Field field, String name) throws Throwable {
-                ReflectionUtils.setValueOnField(instance, field, getValueByName(
-                        name,
-                        row,
-                        cells
-                ));
+            public void each(Field field, String name) throws Throwable
+            {
+                ReflectionUtils.setValueOnField(instance, field, getValueByName(name, row, cells));
             }
         });
 
         return instance;
     }
 
-    public <T> List<T> map() throws Throwable {
+    public <T> List<T> map() throws Throwable
+    {
         InputStream inputStream = null;
         List<T> items = new ArrayList<>();
 
@@ -103,7 +116,7 @@ public class ExOM {
             if (excelFile.getName().endsWith(".xls")) {
                 workbook = new HSSFWorkbook(inputStream);
                 numberOfSheets = workbook.getNumberOfSheets();
-            } else { //2007+
+            } else { // 2007+
                 workbook = new XSSFWorkbook(inputStream);
                 numberOfSheets = workbook.getNumberOfSheets();
             }
@@ -131,7 +144,8 @@ public class ExOM {
         return items;
     }
 
-    private int findIndexCellByName(String name, Row row) {
+    private int findIndexCellByName(String name, Row row)
+    {
         Iterator<Cell> iterator = row.cellIterator();
         while (iterator.hasNext()) {
             Cell cell = iterator.next();
@@ -143,7 +157,8 @@ public class ExOM {
         return -1;
     }
 
-    private String getCellValue(Cell cell) {
+    private String getCellValue(Cell cell)
+    {
         if (cell == null) {
             return null;
         }
